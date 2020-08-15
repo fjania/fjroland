@@ -16,43 +16,73 @@ type Sample struct {
     Volume float32
 }
 
-type Kit struct {
+type SamplePack struct {
     Name string
     Samples map[string]*Sample
+    Instruments map[string]bool
+}
+func SamplePackPath(samplePackName string) string {
+    sep := string(os.PathSeparator)
+    path := ".." + sep + ".." + sep +
+        "assets" + sep + "samplepacks" + sep + samplePackName
+    return path
 }
 
-func LoadKit(kitName string) (*Kit, error) {
-    k := &Kit{
-        Name: kitName,
+func SampleFilePath(samplePackName string, filename string) string {
+    sep := string(os.PathSeparator)
+    path := ".." + sep + ".." + sep +
+        "assets" + sep + "samplepacks" +
+        sep + samplePackName + sep + filename
+    return path
+}
+
+func LoadSamplePack(samplePackName string) (*SamplePack, error) {
+    k := &SamplePack{
+        Name: samplePackName,
         Samples: make(map[string]*Sample),
     }
 
-    sep := string(os.PathSeparator)
-    dir := ".." + sep + ".." + sep + "assets" + sep + "kits" + sep + kitName
-    files, err := ioutil.ReadDir(dir);
+    samplePackPath := SamplePackPath(samplePackName)
+    files, err := ioutil.ReadDir(samplePackPath);
     if err != nil {
         return nil, err
     }
 
     for _, f := range files {
-        filepath := dir + sep + f.Name()
+        sampleFilePath := SampleFilePath(samplePackName, f.Name())
         if strings.HasSuffix(f.Name(), ".wav") {
-            fmt.Println("Loading",filepath)
+            fmt.Println("Loading",sampleFilePath)
             instrument := strings.TrimRight(f.Name(), ".wav")
 
-            sample, err := LoadSample(filepath)
+            sample, err := LoadSample(sampleFilePath)
             if err != nil {
-                fmt.Printf("Could not load sample: %s\n", filepath)
+                fmt.Printf("Could not load sample: %s\n", sampleFilePath)
                 return nil, err
             }
             k.Samples[instrument] = sample
         }
     }
+
+    instruments := make(map[string]bool)
+    for i, _ := range k.Samples {
+        instruments[i] = true
+    }
+    k.Instruments = instruments
+
     return k, nil
 }
 
-func (k *Kit) Play(instrument string, level float32) {
+// Implement the audio Output interface
+func (k *SamplePack) Play(instrument string, level float32) {
     k.Samples[instrument].Play(level);
+}
+
+func (k *SamplePack) ListInstruments() map[string]bool {
+    return k.Instruments
+}
+
+func (k *SamplePack) HasInstrument(instrument string) bool {
+    return k.Instruments[instrument]
 }
 
 func LoadSample(filepath string) (*Sample, error) {
@@ -89,8 +119,8 @@ func (s *Sample) Play(level float32) {
     s.Playhead = 0
 }
 
-func Synth() (*Kit, error) {
-    kit, err := LoadKit("acoustic")
+func NewSamplePack() (*SamplePack, error) {
+    samplePack, err := LoadSamplePack("acoustic")
     if err != nil {
         return nil, err
     }
@@ -105,7 +135,7 @@ func Synth() (*Kit, error) {
         2,
         44100.0,
         portaudio.FramesPerBufferUnspecified,
-        kit.ProcessAudio,
+        samplePack.ProcessAudio,
     )
 
     if err != nil {
@@ -113,10 +143,10 @@ func Synth() (*Kit, error) {
     }
 
     stream.Start()
-    return kit, nil
+    return samplePack, nil
 }
 
-func (k *Kit) ProcessAudio(out []float32) {
+func (k *SamplePack) ProcessAudio(out []float32) {
     for i := range out {
         var data float32
         for _, s := range k.Samples{
@@ -132,5 +162,4 @@ func (k *Kit) ProcessAudio(out []float32) {
 
         out[i] = data
     }
-
 }

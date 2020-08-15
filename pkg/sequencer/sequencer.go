@@ -6,32 +6,27 @@ import (
     "os"
     p "github.com/fjania/froland/pkg/pattern"
     a "github.com/fjania/froland/pkg/audio"
+    w "github.com/fjania/froland/pkg/audio/waveform"
 )
 
 // c := time.Tick(time.Minute/time.Duration(divisionsPerMinute))
 type Sequencer struct {
     Timer   *Timer
     Pattern *p.Pattern
-    Synth   *a.Kit
-    Instruments map[string]bool
+    Output   a.Output
+    PatternFilePath string
 }
 
 func NewSequencer(patternFile, kitName string) (*Sequencer, error) {
-    x, err := a.Synth()
+    x, err := w.NewSamplePack()
     if err != nil {
         log.Fatal(err)
         return nil, err
     }
 
-    instruments := make(map[string]bool)
-    for i, _ := range x.Samples {
-        instruments[i] = true
-    }
-
     s := &Sequencer{
         Timer:   NewTimer(),
-        Synth:   x,
-        Instruments:   instruments,
+        Output:   x,
     }
 
     s.LoadPattern(patternFile)
@@ -45,6 +40,8 @@ func (s *Sequencer) LoadPattern(patternFile string) error {
     patternFilePath := ".." + sep + ".." +
         sep + "assets" + sep +
         "patterns" + sep + patternFile
+
+    s.PatternFilePath = patternFilePath
 
     jsonFile, err := os.Open(patternFilePath)
     if err != nil {
@@ -78,8 +75,8 @@ func (s *Sequencer) Start() {
                 pulseCount++
                 for _, t := range s.Pattern.Tracks {
                     hit := t.Steps[pulse]
-                    if hit > 0  && s.Instruments[t.Instrument]{
-                        s.Synth.Play(t.Instrument, float32(hit))
+                    if hit > 0  && s.Output.HasInstrument(t.Instrument){
+                        s.Output.Play(t.Instrument, float32(hit))
                     }
                 }
             }
