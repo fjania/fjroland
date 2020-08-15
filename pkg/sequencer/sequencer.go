@@ -41,7 +41,11 @@ func NewSequencer(patternFile, kitName string) (*Sequencer, error) {
 
 func (s *Sequencer) LoadPattern(patternFile string) error {
     sep := string(os.PathSeparator)
-    patternFilePath := ".." + sep + ".." + sep + "assets" + sep + "patterns" + sep + patternFile
+
+    patternFilePath := ".." + sep + ".." +
+        sep + "assets" + sep +
+        "patterns" + sep + patternFile
+
     jsonFile, err := os.Open(patternFilePath)
     if err != nil {
         log.Fatal(err)
@@ -57,7 +61,6 @@ func (s *Sequencer) LoadPattern(patternFile string) error {
     }
 
     s.Pattern = pattern
-
     s.Timer.SetTempo(s.Pattern.BPM)
     s.Timer.SetDivisionsPerBeat(s.Pattern.DivisionsPerBeat)
 

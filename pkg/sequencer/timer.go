@@ -36,8 +36,10 @@ func (t *Timer) SetDivisionsPerBeat(dpb int) {
 func (t *Timer) Start() {
     for {
         select {
+        /*
         case <-t.Done:
             break
+            */
         default:
             interval := t.NanosecondsPerPulse()
             time.Sleep(interval)
