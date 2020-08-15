@@ -1,6 +1,7 @@
 package sequencer
 
 import (
+    "log"
     p "github.com/fjania/froland/pkg/pattern"
     a "github.com/fjania/froland/pkg/audio"
 )
@@ -21,10 +22,15 @@ func NewSequencer() (*Sequencer, error) {
         "Bass:  |X-------|--------|X-------|--------|"
     ]}`)
 
-    pattern, _ := p.ParsePattern(jsonBlob)
+    pattern, err := p.ParsePattern(jsonBlob)
+    if err != nil {
+        log.Fatal(err)
+        return nil, err
+    }
 
     x, err := a.Synth()
     if err != nil {
+        log.Fatal(err)
         return nil, err
     }
 
