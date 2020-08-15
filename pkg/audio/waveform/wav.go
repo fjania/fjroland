@@ -30,9 +30,7 @@ func SamplePackPath(samplePackName string) string {
 
 func SampleFilePath(samplePackName string, filename string) string {
     sep := string(os.PathSeparator)
-    path := ".." + sep + ".." + sep +
-        "assets" + sep + "samplepacks" +
-        sep + samplePackName + sep + filename
+    path := SamplePackPath(samplePackName) + sep + filename
     return path
 }
 
