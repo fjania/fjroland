@@ -61,8 +61,7 @@ func (s *Sequencer) LoadPattern(patternFile string) error {
     }
 
     s.Pattern = pattern
-    s.Timer.SetTempo(s.Pattern.BPM)
-    s.Timer.SetDivisionsPerBeat(s.Pattern.DivisionsPerBeat)
+    s.Timer.SetStepInterval(s.Pattern.BPM, s.Pattern.DivisionsPerBeat)
 
     return nil
 }
