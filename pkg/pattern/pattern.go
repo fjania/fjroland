@@ -95,6 +95,7 @@ func ParsePattern(patternJson []byte) (*Pattern, error) {
         )
     }
 
+    // Copy up all the uniform track parameters for easy access later.
     p.Beats = p.Tracks[0].Beats
     p.Divisions = p.Tracks[0].Divisions
     p.DivisionsPerBeat = p.Tracks[0].DivisionsPerBeat
