@@ -22,23 +22,30 @@ type Track struct {
 }
 
 const (
+    SILENT = -1
     GHOST  = 1
     STRIKE = 2
     ACCENT = 3
+    BEATMARKER = "|"
 )
 
-var indicatorsAsLevels = map[string]int{
+var IndicatorsAsLevels = map[string]int{
+    "-": SILENT,
     "o": GHOST,
     "X": STRIKE,
     ">": ACCENT,
 }
 
-var levelsAsIndicators = map[int]string{
+var LevelsAsIndicators = map[int]string{
+    SILENT: "-",
     GHOST:  "o",
     STRIKE: "X",
     ACCENT: ">",
 }
 
+func ToIndicator(level int) string {
+    return LevelsAsIndicators[level]
+}
 /*
 * We'll assume the format of a pattern is a json file** of
 * this format:
@@ -102,9 +109,10 @@ func (track *Track) ParseTrack(trackAsString string) error {
     trackSpec := strings.Trim(parts[1], " ")
 
     // The track layout must start and end with a | character
-    if string(trackSpec[0]) != "|" && string(trackSpec[len(trackSpec)-1]) != "|" {
+    if string(trackSpec[0]) != BEATMARKER && string(trackSpec[len(trackSpec)-1]) != "|" {
         return fmt.Errorf(
-            "Malformed track entry. No leading/trailing '|' characters: %q",
+            "Malformed track entry. No leading/trailing '%s' characters: %q",
+            BEATMARKER,
             trackAsString,
         )
     }
@@ -116,7 +124,7 @@ func (track *Track) ParseTrack(trackAsString string) error {
 
     for _, e := range trackSpec {
         char := string(e)
-        if char == "|" {
+        if char == BEATMARKER {
             // If we reading this first beat, we'll be defining the beats per
             // division we expect from now on.
             if beats == 1 {
@@ -140,7 +148,7 @@ func (track *Track) ParseTrack(trackAsString string) error {
             divisions++
             divisionsInThisBeat++
 
-            if char != "-" && indicatorsAsLevels[char] == 0 {
+            if char != "-" && IndicatorsAsLevels[char] == 0 {
                 return fmt.Errorf(
                     "Malformed track entry. Invalid indicator %s: %s",
                     char,
@@ -160,8 +168,8 @@ func (track *Track) ParseTrack(trackAsString string) error {
     division := 0
     for _, e := range trackSpec {
         char := string(e)
-        if char != "|" {
-            steps[division] = indicatorsAsLevels[char]
+        if char != BEATMARKER {
+            steps[division] = IndicatorsAsLevels[char]
             division++
         }
     }

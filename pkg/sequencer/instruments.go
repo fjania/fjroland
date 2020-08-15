@@ -1,4 +1,4 @@
-package pattern
+package sequencer
 
 type Instrument struct {
     name string
@@ -21,4 +21,4 @@ var instruments = [15]Instrument {
     Instrument{"Ride Bell", 53},
     Instrument{"Tambourine", 54},
     Instrument{"Cowbell", 56},
-
+}
