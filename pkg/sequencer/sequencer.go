@@ -11,6 +11,7 @@ type Sequencer struct {
     Timer   *Timer
     Pattern *p.Pattern
     Synth   *a.Kit
+    Instruments map[string]bool
 }
 
 func NewSequencer() (*Sequencer, error) {
@@ -26,6 +27,7 @@ func NewSequencer() (*Sequencer, error) {
     "bpm": 100,
     "tracks": [
         "Snare: |>-X-X->-|X-X->-X-|X->-X-X-|>->->>>>|",
+        "Clap:  |X-------|--------|X-------|--------|",
         "Bass:  |X-------|--------|X-------|--------|"
     ]}`)
 
@@ -41,10 +43,16 @@ func NewSequencer() (*Sequencer, error) {
         return nil, err
     }
 
+    instruments := make(map[string]bool)
+    for i, _ := range x.Samples {
+        instruments[i] = true
+    }
+
     s := &Sequencer{
         Timer:   NewTimer(),
         Pattern: pattern,
         Synth:   x,
+        Instruments:   instruments,
     }
 
     return s, nil
@@ -58,11 +66,11 @@ func (s *Sequencer) Start() {
             select {
             case <-s.Timer.Pulses:
                 pulse := pulseCount % s.Pattern.Divisions
-                RenderPattern(s.Pattern, pulse)
+                RenderPattern(s, pulse)
                 pulseCount++
                 for _, t := range s.Pattern.Tracks {
                     hit := t.Steps[pulse]
-                    if hit > 0 {
+                    if hit > 0  && s.Instruments[t.Instrument]{
                         s.Synth.Play(t.Instrument, float32(hit))
                     }
                 }
