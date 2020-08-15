@@ -15,5 +15,8 @@ func TestRenderPattern(t *testing.T){
     ]}`)
 
     pattern, _ := p.ParsePattern(jsonBlob)
-    RenderPattern(pattern)
+    RenderPattern(pattern, 0)
+    RenderPattern(pattern, 15)
+    RenderPattern(pattern, 20)
+    RenderPattern(pattern, 31)
 }
