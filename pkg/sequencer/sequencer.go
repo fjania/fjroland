@@ -6,7 +6,8 @@ import (
     "os"
     p "github.com/fjania/froland/pkg/pattern"
     a "github.com/fjania/froland/pkg/audio"
-    w "github.com/fjania/froland/pkg/audio/waveform"
+    //w "github.com/fjania/froland/pkg/audio/waveform"
+    m "github.com/fjania/froland/pkg/audio/midi"
 )
 
 // c := time.Tick(time.Minute/time.Duration(divisionsPerMinute))
@@ -18,7 +19,8 @@ type Sequencer struct {
 }
 
 func NewSequencer(patternFile, kitName string) (*Sequencer, error) {
-    x, err := w.NewSamplePack()
+    //x, err := w.NewSamplePack()
+    x, err := m.NewMidi()
     if err != nil {
         log.Fatal(err)
         return nil, err
