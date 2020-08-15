@@ -1,17 +1,17 @@
 package sequencer
 
 import (
-	p "github.com/fjania/froland/pkg/pattern"
+    p "github.com/fjania/froland/pkg/pattern"
 )
 
 // c := time.Tick(time.Minute/time.Duration(divisionsPerMinute))
 type Sequencer struct {
-	Timer   *Timer
-	Pattern *p.Pattern
+    Timer   *Timer
+    Pattern *p.Pattern
 }
 
 func NewSequencer() (*Sequencer, error) {
-	var jsonBlob = []byte(`
+    var jsonBlob = []byte(`
     {"title": "Turn Down for What",
     "bpm": 100,
     "tracks": [
@@ -19,31 +19,31 @@ func NewSequencer() (*Sequencer, error) {
         "Bass:  |X-------|--------|X-------|--------|"
     ]}`)
 
-	pattern, _ := p.ParsePattern(jsonBlob)
+    pattern, _ := p.ParsePattern(jsonBlob)
 
-	s := &Sequencer{
-		Timer:   NewTimer(),
-		Pattern: pattern,
-	}
+    s := &Sequencer{
+        Timer:   NewTimer(),
+        Pattern: pattern,
+    }
 
-	return s, nil
+    return s, nil
 }
 
 func (s *Sequencer) Start() {
-	go func() {
-		pulseCount := 0
+    go func() {
+        pulseCount := 0
 
-		for {
-			select {
-			case <-s.Timer.Pulses:
-				divisions := s.Pattern.Divisions
-				RenderPattern(s.Pattern, pulseCount%divisions)
-				pulseCount++
-			}
-		}
-	}()
+        for {
+            select {
+            case <-s.Timer.Pulses:
+                pulse := pulseCount % s.Pattern.Divisions
+                RenderPattern(s.Pattern, pulse)
+                pulseCount++
+            }
+        }
+    }()
 
-	s.Timer.SetTempo(s.Pattern.BPM)
-	s.Timer.SetDivisionsPerBeat(s.Pattern.DivisionsPerBeat)
-	go s.Timer.Start()
+    s.Timer.SetTempo(s.Pattern.BPM)
+    s.Timer.SetDivisionsPerBeat(s.Pattern.DivisionsPerBeat)
+    go s.Timer.Start()
 }
