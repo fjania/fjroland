@@ -43,9 +43,6 @@ var LevelsAsIndicators = map[int]string{
     ACCENT: ">",
 }
 
-func ToIndicator(level int) string {
-    return LevelsAsIndicators[level]
-}
 /*
 * We'll assume the format of a pattern is a json file** of
 * this format:

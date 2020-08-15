@@ -4,8 +4,7 @@ import (
     "flag"
     "fmt"
     "time"
-    p "github.com/fjania/froland/pkg/pattern"
-    s "github.com/fjania/froland/pkg/sequencer"
+    "github.com/fjania/froland/pkg/sequencer"
 )
 
 func main() {
@@ -29,19 +28,11 @@ func main() {
     flag.Parse()
     fmt.Println(patternPath, kitPath)
 
-    var jsonBlob = []byte(`
-    {"title": "Turn Down for What",
-    "bpm": 100,
-    "tracks": [
-        "Snare: |>-X-X->-|X-X->-X-|X->-X-X-|>->->>>>|",
-        "Bass:  |X-------|--------|X-------|--------|"
-    ]}`)
+    s, _ := sequencer.NewSequencer()
+    fmt.Println(s)
+    s.Start()
 
-    pattern, _ := p.ParsePattern(jsonBlob)
-    i := 0
     for {
-        s.RenderPattern(pattern, i%32)
-        i++
-        time.Sleep(time.Second/8)
+        time.Sleep(time.Second)
     }
 }
