@@ -2,34 +2,31 @@ package main
 
 import (
     "flag"
-    "fmt"
     "time"
     "github.com/fjania/froland/pkg/sequencer"
 )
 
 func main() {
-    var patternPath string
-    var kitPath string
+    var patternFile string
+    var kitName string
 
     flag.StringVar(
-        &patternPath,
+        &patternFile,
         "pattern",
-        "patterns/pattern_1.splice",
-        "-pattern=path/to/pattern.splice",
+        "turn-down-for-what.json",
+        "-pattern=pattern-file.json",
     )
 
     flag.StringVar(
-        &kitPath,
+        &kitName,
         "kit",
-        "kits",
-        "-kit=path/to/kits",
+        "acoustic",
+        "-kit=kit-name",
     )
 
     flag.Parse()
-    fmt.Println(patternPath, kitPath)
 
-    s, _ := sequencer.NewSequencer()
-    fmt.Println(s)
+    s, _ := sequencer.NewSequencer(patternFile, kitName)
     s.Start()
 
     for {

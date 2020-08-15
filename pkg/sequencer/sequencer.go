@@ -1,7 +1,9 @@
 package sequencer
 
 import (
+    "io/ioutil"
     "log"
+    "os"
     p "github.com/fjania/froland/pkg/pattern"
     a "github.com/fjania/froland/pkg/audio"
 )
@@ -14,22 +16,16 @@ type Sequencer struct {
     Instruments map[string]bool
 }
 
-func NewSequencer() (*Sequencer, error) {
-    /*
-        "Snare:         |----|X---|----|X---|",
-        "Closed Hi-Hat: |X-X-|X-X-|X-X-|X-X-|",
-        "Bass:          |X---|X---|X---|X---|"
-        "Snare:         |----|X---|----|X---|",
-        "Snare:         |X---|----|X---|----|"
-    */
-    var jsonBlob = []byte(`
-    {"title": "Turn Down for What",
-    "bpm": 100,
-    "tracks": [
-        "Snare: |>-X-X->-|X-X->-X-|X->-X-X-|>->->>>>|",
-        "Clap:  |X-------|--------|X-------|--------|",
-        "Bass:  |X-------|--------|X-------|--------|"
-    ]}`)
+func NewSequencer(patternFile, kitName string) (*Sequencer, error) {
+    sep := string(os.PathSeparator)
+    patternFilePath := ".." + sep + ".." + sep + "assets" + sep + "patterns" + sep + patternFile
+    jsonFile, err := os.Open(patternFilePath)
+    if err != nil {
+        log.Fatal(err)
+        return nil, err
+    }
+    jsonBlob, _ := ioutil.ReadAll(jsonFile)
+    jsonFile.Close()
 
     pattern, err := p.ParsePattern(jsonBlob)
     if err != nil {

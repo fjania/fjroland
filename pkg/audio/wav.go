@@ -2,6 +2,7 @@ package audio
 
 import (
     "fmt"
+    "os"
     "strings"
     "io/ioutil"
     "github.com/gordonklaus/portaudio"
@@ -26,14 +27,15 @@ func LoadKit(kitName string) (*Kit, error) {
         Samples: make(map[string]*Sample),
     }
 
-    dir := fmt.Sprintf("../../assets/kits/%s/", kitName)
+    sep := string(os.PathSeparator)
+    dir := ".." + sep + ".." + sep + "assets" + sep + "kits" + sep + kitName
     files, err := ioutil.ReadDir(dir);
     if err != nil {
         return nil, err
     }
 
     for _, f := range files {
-        filepath := fmt.Sprintf("../../assets/kits/%s/%s", kitName, f.Name())
+        filepath := dir + sep + f.Name()
         if strings.HasSuffix(f.Name(), ".wav") {
             fmt.Println("Loading",filepath)
             instrument := strings.TrimRight(f.Name(), ".wav")
