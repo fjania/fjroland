@@ -17,22 +17,6 @@ type Sequencer struct {
 }
 
 func NewSequencer(patternFile, kitName string) (*Sequencer, error) {
-    sep := string(os.PathSeparator)
-    patternFilePath := ".." + sep + ".." + sep + "assets" + sep + "patterns" + sep + patternFile
-    jsonFile, err := os.Open(patternFilePath)
-    if err != nil {
-        log.Fatal(err)
-        return nil, err
-    }
-    jsonBlob, _ := ioutil.ReadAll(jsonFile)
-    jsonFile.Close()
-
-    pattern, err := p.ParsePattern(jsonBlob)
-    if err != nil {
-        log.Fatal(err)
-        return nil, err
-    }
-
     x, err := a.Synth()
     if err != nil {
         log.Fatal(err)
@@ -46,12 +30,38 @@ func NewSequencer(patternFile, kitName string) (*Sequencer, error) {
 
     s := &Sequencer{
         Timer:   NewTimer(),
-        Pattern: pattern,
         Synth:   x,
         Instruments:   instruments,
     }
 
+    s.LoadPattern(patternFile)
+
     return s, nil
+}
+
+func (s *Sequencer) LoadPattern(patternFile string) error {
+    sep := string(os.PathSeparator)
+    patternFilePath := ".." + sep + ".." + sep + "assets" + sep + "patterns" + sep + patternFile
+    jsonFile, err := os.Open(patternFilePath)
+    if err != nil {
+        log.Fatal(err)
+        return err
+    }
+    jsonBlob, _ := ioutil.ReadAll(jsonFile)
+    jsonFile.Close()
+
+    pattern, err := p.ParsePattern(jsonBlob)
+    if err != nil {
+        log.Fatal(err)
+        return err
+    }
+
+    s.Pattern = pattern
+
+    s.Timer.SetTempo(s.Pattern.BPM)
+    s.Timer.SetDivisionsPerBeat(s.Pattern.DivisionsPerBeat)
+
+    return nil
 }
 
 func (s *Sequencer) Start() {
@@ -74,7 +84,5 @@ func (s *Sequencer) Start() {
         }
     }()
 
-    s.Timer.SetTempo(s.Pattern.BPM)
-    s.Timer.SetDivisionsPerBeat(s.Pattern.DivisionsPerBeat)
     go s.Timer.Start()
 }

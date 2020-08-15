@@ -2,7 +2,8 @@ package main
 
 import (
     "flag"
-    "time"
+    "fmt"
+    //"time"
     "github.com/fjania/froland/pkg/sequencer"
 )
 
@@ -30,6 +31,9 @@ func main() {
     s.Start()
 
     for {
-        time.Sleep(time.Second)
+        out, err := fmt.Scanln()
+        fmt.Println(out, err)
+        //time.Sleep(time.Second * 3)
+        s.LoadPattern(patternFile)
     }
 }
