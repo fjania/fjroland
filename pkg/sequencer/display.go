@@ -1,9 +1,8 @@
-package main
+package sequencer
 
 import (
     "fmt"
     "strings"
-    "time"
     p "github.com/fjania/froland/pkg/pattern"
     tm "github.com/buger/goterm"
 )
@@ -43,29 +42,17 @@ func RenderPattern(pattern *p.Pattern, pulse int){
     tm.Println(tm.Bold("BPM :"),pattern.BPM)
     tm.Println()
 
-    labelFormatter := fmt.Sprintf("%%-%ds", 16)
+    maxLabel := 0
+    for _, t := range pattern.Tracks {
+        if len(t.Instrument) > maxLabel {
+            maxLabel = len(t.Instrument)
+        }
+    }
+    labelFormatter := fmt.Sprintf("%%-%ds", maxLabel+2)
 
     for _, t := range pattern.Tracks {
         tm.Println(fmt.Sprintf(labelFormatter, t.Instrument), RenderTimeline(t, pulse))
     }
 
     tm.Flush()
-}
-
-func main() {
-    var jsonBlob = []byte(`
-    {"title": "Turn Down for What",
-    "bpm": 100,
-    "tracks": [
-        "Snare: |>-X-X->-|X-X->-X-|X->-X-X-|>->->>>>|",
-        "Bass:  |X-------|--------|X-------|--------|"
-    ]}`)
-
-    pattern, _ := p.ParsePattern(jsonBlob)
-    i := 0
-    for {
-        RenderPattern(pattern, i%32)
-        i++
-        time.Sleep(time.Second/8)
-    }
 }
