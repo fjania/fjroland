@@ -25,25 +25,33 @@ type Track struct {
 }
 
 const (
-    SILENT = -1
+    SILENT = 0
+    SILENTMARKER = "-"
+
     GHOST  = 1
+    GHOSTMARKER  = "o"
+
     STRIKE = 2
+    STRIKEMARKER = "X"
+
     ACCENT = 3
+    ACCENTMARKER = ">"
+
     BEATMARKER = "|"
 )
 
 var IndicatorsAsLevels = map[string]int{
-    "-": SILENT,
-    "o": GHOST,
-    "X": STRIKE,
-    ">": ACCENT,
+    SILENTMARKER: SILENT,
+    GHOSTMARKER: GHOST,
+    STRIKEMARKER: STRIKE,
+    ACCENTMARKER: ACCENT,
 }
 
 var LevelsAsIndicators = map[int]string{
-    SILENT: "-",
-    GHOST:  "o",
-    STRIKE: "X",
-    ACCENT: ">",
+    SILENT: SILENTMARKER,
+    GHOST:  GHOSTMARKER,
+    STRIKE: STRIKEMARKER,
+    ACCENT: ACCENTMARKER,
 }
 
 /*
@@ -162,7 +170,7 @@ func (track *Track) ParseTrack(trackAsString string) error {
             divisions++
             divisionsInThisBeat++
 
-            if char != "-" && IndicatorsAsLevels[char] == 0 {
+            if char != SILENTMARKER && IndicatorsAsLevels[char] == 0 {
                 return fmt.Errorf(
                     "Malformed track entry. Invalid indicator %s: %s",
                     char,
