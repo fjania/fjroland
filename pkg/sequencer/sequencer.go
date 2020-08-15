@@ -14,6 +14,13 @@ type Sequencer struct {
 }
 
 func NewSequencer() (*Sequencer, error) {
+    /*
+        "Snare:         |----|X---|----|X---|",
+        "Closed Hi-Hat: |X-X-|X-X-|X-X-|X-X-|",
+        "Bass:          |X---|X---|X---|X---|"
+        "Snare:         |----|X---|----|X---|",
+        "Snare:         |X---|----|X---|----|"
+    */
     var jsonBlob = []byte(`
     {"title": "Turn Down for What",
     "bpm": 100,

@@ -1,9 +1,9 @@
 package pattern
 
 import (
-    //"bufio"
     "encoding/json"
     "fmt"
+    "log"
     "strings"
 )
 
@@ -76,6 +76,7 @@ func ParsePattern(patternJson []byte) (*Pattern, error) {
     var p Pattern
     err := json.Unmarshal(patternJson, &p)
     if err != nil {
+        log.Fatal("Error parsing JSON file. ", err)
         return nil, err
     }
 
