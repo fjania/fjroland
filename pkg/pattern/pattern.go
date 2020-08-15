@@ -81,6 +81,11 @@ func ParsePattern(patternJson []byte) (*Pattern, error) {
     }
 
     // Todo - fail on patterns with no tracks
+    if len(p.Tracks) == 0 {
+        return nil, fmt.Errorf(
+            "Malformed track entry. There must be at least one track in the file.",
+        )
+    }
 
     p.Beats = p.Tracks[0].Beats
     p.Divisions = p.Tracks[0].Divisions
@@ -116,7 +121,9 @@ func (track *Track) ParseTrack(trackAsString string) error {
     trackSpec := strings.Trim(parts[1], " ")
 
     // The track layout must start and end with a | character
-    if string(trackSpec[0]) != BEATMARKER && string(trackSpec[len(trackSpec)-1]) != "|" {
+    start := string(trackSpec[0])
+    end := string(trackSpec[len(trackSpec)-1])
+    if start != BEATMARKER && end != BEATMARKER {
         return fmt.Errorf(
             "Malformed track entry. No leading/trailing '%s' characters: %q",
             BEATMARKER,
