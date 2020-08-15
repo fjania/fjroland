@@ -89,14 +89,14 @@ func NewMidi() (*Midi, error){
 
 func (m *Midi) demo(){
     // Send "note on" events to play C major chord.
-    for i := 0; i< 12; i++ {
-        m.Play("Closed Hi-Hat", 127)
+    for i := 0; i< 120; i++ {
+        m.Play("Closed Hi-Hat", 2)
         time.Sleep(time.Second/8)
-        m.Play("Clap", 127)
+        m.Play("Clap", 2)
         time.Sleep(time.Second/8)
-        m.Play("Snare", 127)
+        m.Play("Snare", 2)
         time.Sleep(time.Second/8)
-        m.Play("Bass", 127)
+        m.Play("Bass", 2)
         time.Sleep(time.Second/8)
     }
 }
