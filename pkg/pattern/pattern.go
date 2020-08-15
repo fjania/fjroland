@@ -11,6 +11,9 @@ type Pattern struct {
     Title   string
     BPM    int
     Tracks []Track
+    Beats            int
+    Divisions        int
+    DivisionsPerBeat int
 }
 
 type Track struct {
@@ -75,6 +78,12 @@ func ParsePattern(patternJson []byte) (*Pattern, error) {
     if err != nil {
         return nil, err
     }
+
+    // Todo - fail on patterns with no tracks
+
+    p.Beats = p.Tracks[0].Beats
+    p.Divisions = p.Tracks[0].Divisions
+    p.DivisionsPerBeat = p.Tracks[0].DivisionsPerBeat
 
     return &p, nil
 }
