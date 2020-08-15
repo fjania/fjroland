@@ -2,12 +2,14 @@ package sequencer
 
 import (
     p "github.com/fjania/froland/pkg/pattern"
+    a "github.com/fjania/froland/pkg/audio"
 )
 
 // c := time.Tick(time.Minute/time.Duration(divisionsPerMinute))
 type Sequencer struct {
     Timer   *Timer
     Pattern *p.Pattern
+    Synth   *a.Kit
 }
 
 func NewSequencer() (*Sequencer, error) {
@@ -21,9 +23,15 @@ func NewSequencer() (*Sequencer, error) {
 
     pattern, _ := p.ParsePattern(jsonBlob)
 
+    x, err := a.Synth()
+    if err != nil {
+        return nil, err
+    }
+
     s := &Sequencer{
         Timer:   NewTimer(),
         Pattern: pattern,
+        Synth:   x,
     }
 
     return s, nil
@@ -39,6 +47,12 @@ func (s *Sequencer) Start() {
                 pulse := pulseCount % s.Pattern.Divisions
                 RenderPattern(s.Pattern, pulse)
                 pulseCount++
+                for _, t := range s.Pattern.Tracks {
+                    hit := t.Steps[pulse]
+                    if hit > 0 {
+                        s.Synth.Play(t.Instrument, float32(hit))
+                    }
+                }
             }
         }
     }()

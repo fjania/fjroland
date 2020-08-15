@@ -3,7 +3,6 @@ package audio
 import (
     "fmt"
     "strings"
-    "time"
     "io/ioutil"
     "github.com/gordonklaus/portaudio"
     "github.com/mkb218/gosndfile/sndfile"
@@ -50,8 +49,8 @@ func LoadKit(kitName string) (*Kit, error) {
     return k, nil
 }
 
-func (k *Kit) Play(instrument string, volume float32) {
-    k.Samples[instrument].Play(volume);
+func (k *Kit) Play(instrument string, level float32) {
+    k.Samples[instrument].Play(level);
 }
 
 func LoadSample(filepath string) (*Sample, error) {
@@ -83,19 +82,20 @@ func LoadSample(filepath string) (*Sample, error) {
     return s, nil
 }
 
-func (s *Sample) Play(volume float32) {
-    s.Volume = volume
+func (s *Sample) Play(level float32) {
+    s.Volume = level*level
     s.Playhead = 0
 }
 
-func Music() {
+func Synth() (*Kit, error) {
     kit, err := LoadKit("acoustic")
-    fmt.Printf("%+v\n", kit)
-    fmt.Printf("%+v\n", err)
+    if err != nil {
+        return nil, err
+    }
 
     err = portaudio.Initialize()
     if err != nil {
-        fmt.Println("Error>",err)
+        return nil, err
     }
 
     stream, err := portaudio.OpenDefaultStream(
@@ -107,73 +107,11 @@ func Music() {
     )
 
     if err != nil {
-        fmt.Println("Error>",err)
+        return nil, err
     }
 
     stream.Start()
-
-    time.Sleep(time.Second*2)
-
-    strike := float32(0.5)
-    accent := float32(2)
-    for i:= 0; i<4; i++ {
-    kit.Play("Snare", accent);
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    kit.Play("Snare", strike);
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    kit.Play("Snare", strike);
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    kit.Play("Snare", accent);
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    kit.Play("Snare", strike);
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    kit.Play("Snare", strike);
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    kit.Play("Snare", accent);
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    kit.Play("Snare", strike);
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    kit.Play("Snare", strike);
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    kit.Play("Snare", accent);
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    kit.Play("Snare", strike);
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    kit.Play("Snare", strike);
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    kit.Play("Snare", accent);
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    kit.Play("Snare", accent);
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    kit.Play("Snare", accent);
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    kit.Play("Snare", accent);
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    kit.Play("Snare", accent);
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    kit.Play("Snare", accent);
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    kit.Play("Snare", accent);
-    time.Sleep( time.Duration(time.Minute / time.Duration(100*8)))
-    }
-
-    time.Sleep(time.Second*2)
-
-
+    return kit, nil
 }
 
 func (k *Kit) ProcessAudio(out []float32) {
