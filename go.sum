@@ -6,6 +6,8 @@ github.com/gordonklaus/portaudio v0.0.0-20180817120803-00e7307ccd93 h1:TSG+DyZBn
 github.com/gordonklaus/portaudio v0.0.0-20180817120803-00e7307ccd93/go.mod h1:HfYnZi/ARQKG0dwH5HNDmPCHdLiFiBf+SI7DbhW7et4=
 github.com/mkb218/gosndfile v0.0.0-20171006180803-e0c9ef895ee2 h1:VxuHU1GzpitRcSRQLMsYzmiR4AWli0ZIAwuay3nAdng=
 github.com/mkb218/gosndfile v0.0.0-20171006180803-e0c9ef895ee2/go.mod h1:Bt3M0pOPhXFJld5U1F484ASifG9E1Tych5ukWdGXnxw=
+github.com/rakyll/portmidi v0.0.0-20191102002215-74e95e8bc9b1 h1:ayxM9WkC6QRX0QnfrbZa98pfFqrNq1jo+58rWL1qjZs=
+github.com/rakyll/portmidi v0.0.0-20191102002215-74e95e8bc9b1/go.mod h1:xKffaBd7e1YUoLpR2azvJqkxEdUDNGNDMlsUNdv6Bcs=
 golang.org/x/sys v0.0.0-20191005200804-aed5e4c7ecf9/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200814200057-3d37ad5750ed h1:J22ig1FUekjjkmZUM7pTKixYm8DvrYsvrBZdunYeIuQ=
 golang.org/x/sys v0.0.0-20200814200057-3d37ad5750ed/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
