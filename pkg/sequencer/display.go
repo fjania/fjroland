@@ -3,7 +3,7 @@ package sequencer
 import (
     "fmt"
     tm "github.com/buger/goterm"
-    p "github.com/fjania/froland/pkg/pattern"
+    p "github.com/fjania/fjroland/pkg/pattern"
     "strings"
 )
 

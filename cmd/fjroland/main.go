@@ -6,7 +6,7 @@ import (
     "log"
     "os"
     "time"
-    "github.com/fjania/froland/pkg/sequencer"
+    "github.com/fjania/fjroland/pkg/sequencer"
     "github.com/fsnotify/fsnotify"
 )
 

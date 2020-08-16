@@ -1,4 +1,4 @@
-module github.com/fjania/froland
+module github.com/fjania/fjroland
 
 go 1.15
 

@@ -4,10 +4,10 @@ import (
     "io/ioutil"
     "log"
     "os"
-    p "github.com/fjania/froland/pkg/pattern"
-    a "github.com/fjania/froland/pkg/audio"
-    w "github.com/fjania/froland/pkg/audio/waveform"
-    m "github.com/fjania/froland/pkg/audio/midi"
+    p "github.com/fjania/fjroland/pkg/pattern"
+    a "github.com/fjania/fjroland/pkg/audio"
+    w "github.com/fjania/fjroland/pkg/audio/waveform"
+    m "github.com/fjania/fjroland/pkg/audio/midi"
 )
 
 // c := time.Tick(time.Minute/time.Duration(divisionsPerMinute))
