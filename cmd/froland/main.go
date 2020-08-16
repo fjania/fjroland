@@ -11,16 +11,9 @@ import (
 )
 
 func main() {
-    var patternFile string
     var output string
     var samplePack string
 
-    flag.StringVar(
-        &patternFile,
-        "pattern",
-        "turn-down-for-what.json",
-        "--pattern=pattern-file.json",
-    )
 
     flag.StringVar(
         &output,
@@ -32,16 +25,24 @@ func main() {
     flag.StringVar(
         &samplePack,
         "samplepack",
-        "acoustic",
-        "--samplepack=pack-name",
+        "",
+        "--samplepack=path-to-sample-pack",
     )
 
     flag.Parse()
 
+
+    if len(flag.Args()) < 1{
+        Usage()
+        os.Exit(1)
+    }
+
+    patternFile := flag.Args()[0]
+
     s, _ := sequencer.NewSequencer(patternFile, output, samplePack)
     s.Start()
 
-    if (output != "samples" &&  output != "midi") {
+    if output != "samples" &&  output != "midi" {
         Usage()
         os.Exit(1)
     }

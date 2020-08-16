@@ -17,37 +17,22 @@ type Sample struct {
 }
 
 type SamplePack struct {
-    Name string
     Samples map[string]*Sample
     Instruments map[string]bool
 }
-func SamplePackPath(samplePackName string) string {
-    sep := string(os.PathSeparator)
-    path := ".." + sep + ".." + sep +
-        "assets" + sep + "samplepacks" + sep + samplePackName
-    return path
-}
 
-func SampleFilePath(samplePackName string, filename string) string {
-    sep := string(os.PathSeparator)
-    path := SamplePackPath(samplePackName) + sep + filename
-    return path
-}
-
-func LoadSamplePack(samplePackName string) (*SamplePack, error) {
+func LoadSamplePack(samplePackPath string) (*SamplePack, error) {
     k := &SamplePack{
-        Name: samplePackName,
         Samples: make(map[string]*Sample),
     }
 
-    samplePackPath := SamplePackPath(samplePackName)
     files, err := ioutil.ReadDir(samplePackPath);
     if err != nil {
         return nil, err
     }
 
     for _, f := range files {
-        sampleFilePath := SampleFilePath(samplePackName, f.Name())
+        sampleFilePath := samplePackPath + string(os.PathSeparator) + f.Name()
         if strings.HasSuffix(f.Name(), ".wav") {
             log.Println("Loading",sampleFilePath)
             instrument := strings.TrimRight(f.Name(), ".wav")
@@ -117,8 +102,8 @@ func (s *Sample) Play(level float32) {
     s.Playhead = 0
 }
 
-func NewSamplePack() (*SamplePack, error) {
-    samplePack, err := LoadSamplePack("acoustic")
+func NewSamplePack(samplePackPath string) (*SamplePack, error) {
+    samplePack, err := LoadSamplePack(samplePackPath)
     if err != nil {
         return nil, err
     }
