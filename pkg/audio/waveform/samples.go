@@ -1,7 +1,7 @@
 package audio
 
 import (
-    "fmt"
+    "log"
     "os"
     "strings"
     "io/ioutil"
@@ -49,12 +49,12 @@ func LoadSamplePack(samplePackName string) (*SamplePack, error) {
     for _, f := range files {
         sampleFilePath := SampleFilePath(samplePackName, f.Name())
         if strings.HasSuffix(f.Name(), ".wav") {
-            fmt.Println("Loading",sampleFilePath)
+            log.Println("Loading",sampleFilePath)
             instrument := strings.TrimRight(f.Name(), ".wav")
 
             sample, err := LoadSample(sampleFilePath)
             if err != nil {
-                fmt.Printf("Could not load sample: %s\n", sampleFilePath)
+                log.Printf("Could not load sample: %s\n", sampleFilePath)
                 return nil, err
             }
             k.Samples[instrument] = sample
@@ -95,13 +95,13 @@ func LoadSample(filepath string) (*Sample, error) {
     }
 
     if err != nil {
-        fmt.Printf("Could not open file: %s\n", filepath)
+        log.Printf("Could not open file: %s\n", filepath)
         return nil, err
     }
 
     _, err = soundFile.ReadItems(s.Buffer)
     if err != nil {
-        fmt.Printf("Error reading data from file: %s\n", filepath)
+        log.Printf("Error reading data from file: %s\n", filepath)
         return nil, err
     }
 

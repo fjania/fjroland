@@ -2,7 +2,9 @@ package main
 
 import (
     "flag"
+    "fmt"
     "log"
+    "os"
     "time"
     "github.com/fjania/froland/pkg/sequencer"
     "github.com/fsnotify/fsnotify"
@@ -10,26 +12,39 @@ import (
 
 func main() {
     var patternFile string
-    var kitName string
+    var output string
+    var samplePack string
 
     flag.StringVar(
         &patternFile,
         "pattern",
         "turn-down-for-what.json",
-        "-pattern=pattern-file.json",
+        "--pattern=pattern-file.json",
     )
 
     flag.StringVar(
-        &kitName,
-        "kit",
+        &output,
+        "output",
+        "samples",
+        "--output=samples | midi",
+    )
+
+    flag.StringVar(
+        &samplePack,
+        "samplepack",
         "acoustic",
-        "-kit=kit-name",
+        "--samplepack=pack-name",
     )
 
     flag.Parse()
 
-    s, _ := sequencer.NewSequencer(patternFile, kitName)
+    s, _ := sequencer.NewSequencer(patternFile, output, samplePack)
     s.Start()
+
+    if (output != "samples" &&  output != "midi") {
+        Usage()
+        os.Exit(1)
+    }
 
     watcher, err := fsnotify.NewWatcher()
     if err != nil {
@@ -58,4 +73,9 @@ func main() {
     for {
         time.Sleep(time.Second * 3)
     }
+}
+
+var Usage = func() {
+    fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
+    flag.PrintDefaults()
 }

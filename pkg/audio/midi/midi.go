@@ -1,7 +1,6 @@
 package audio
 
 import (
-    "fmt"
     "log"
     "time"
     "github.com/rakyll/portmidi"
@@ -65,10 +64,10 @@ func NewMidi() (*Midi, error){
 
     portmidi.Initialize()
 
-    fmt.Println(portmidi.CountDevices())
-    fmt.Printf("%+v\n", portmidi.Info(portmidi.DefaultOutputDeviceID()))
-    fmt.Println(portmidi.DefaultInputDeviceID())
-    fmt.Println(portmidi.DefaultOutputDeviceID())
+    log.Println("Midi Device Count>", portmidi.CountDevices())
+    log.Printf("Default Device Info> %+v\n", portmidi.Info(portmidi.DefaultOutputDeviceID()))
+    log.Println("Default Input Device>", portmidi.DefaultInputDeviceID())
+    log.Println("Default Output Device>", portmidi.DefaultOutputDeviceID())
 
     var streamErr error
     m.OutputStream, streamErr = portmidi.NewOutputStream(
@@ -78,11 +77,7 @@ func NewMidi() (*Midi, error){
         log.Fatal(streamErr)
     }
 
-    fmt.Printf("%+v\n", portmidi.Info(portmidi.DefaultOutputDeviceID()))
-
-    //defer m.OutputStream.Close()
-    fmt.Printf("%+v\n", portmidi.Info(portmidi.DefaultOutputDeviceID()))
-    //defer portmidi.Terminate()
+    log.Printf("Default Device Info> %+v\n", portmidi.Info(portmidi.DefaultOutputDeviceID()))
 
     return m, nil
 }
