@@ -25,7 +25,7 @@ func main() {
     flag.StringVar(
         &samplePack,
         "samplepack",
-        "",
+        "assets/samplepacks/acoustic",
         "--samplepack=path-to-sample-pack",
     )
 
