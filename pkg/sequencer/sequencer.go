@@ -18,12 +18,13 @@ type Sequencer struct {
     PatternFilePath string
 }
 
-func NewSequencer(patternFile, output, samplePackPath string) (*Sequencer, error) {
+func NewSequencer(patternFilePath, output, samplePackPath string) (*Sequencer, error) {
     s := &Sequencer{
         Timer:   NewTimer(),
     }
 
-    s.LoadPattern(patternFile)
+    s.PatternFilePath = patternFilePath
+    s.LoadPattern(patternFilePath)
 
     if output == "samples" {
         o, err := w.NewSamplePack(samplePackPath)
@@ -44,8 +45,8 @@ func NewSequencer(patternFile, output, samplePackPath string) (*Sequencer, error
     return s, nil
 }
 
-func (s *Sequencer) LoadPattern(patternFile string) error {
-    jsonFile, err := os.Open(patternFile)
+func (s *Sequencer) LoadPattern(patternFilePath string) error {
+    jsonFile, err := os.Open(patternFilePath)
     if err != nil {
         log.Fatal(err)
         return err
