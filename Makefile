@@ -1,2 +1,3 @@
 build:
-	go build -o bin/froland cmd/froland/main.go
+	go build -o bin/fjroland cmd/fjroland/main.go
+
