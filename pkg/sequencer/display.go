@@ -37,23 +37,22 @@ func RenderTimeline(track p.Track, pulse int, available bool) string {
 }
 
 func RenderPattern(s *Sequencer, pulse int) {
-	pattern := s.Pattern
 	tm.Clear()
 	tm.MoveCursor(1, 1)
 
-	tm.Println(tm.Bold("Song:"), pattern.Title)
-	tm.Println(tm.Bold("BPM :"), pattern.BPM)
+	tm.Println(tm.Bold("Song:"), s.Pattern.Title)
+	tm.Println(tm.Bold("BPM :"), s.Pattern.BPM)
 	tm.Println()
 
 	maxLabel := 0
-	for _, t := range pattern.Tracks {
+	for _, t := range s.Pattern.Tracks {
 		if len(t.Instrument) > maxLabel {
 			maxLabel = len(t.Instrument)
 		}
 	}
 	labelFormatter := fmt.Sprintf("%%-%ds", maxLabel+2)
 
-	for _, t := range pattern.Tracks {
+	for _, t := range s.Pattern.Tracks {
 		isAvailable := s.IsInstrumentAvailable(t.Instrument)
 		trackLabel := fmt.Sprintf(labelFormatter, t.Instrument)
 		if !isAvailable {
