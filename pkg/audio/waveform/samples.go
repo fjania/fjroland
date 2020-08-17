@@ -29,7 +29,7 @@ func LoadSamplePack(samplePackPath string) (*SamplePack, error) {
 
 	files, err := ioutil.ReadDir(samplePackPath)
 	if err != nil {
-		return nil, err
+		log.Fatalf("Could not load sample pack: '%s'\n", samplePackPath)
 	}
 
 	for _, f := range files {
@@ -40,8 +40,7 @@ func LoadSamplePack(samplePackPath string) (*SamplePack, error) {
 
 			sample, err := LoadSample(sampleFilePath)
 			if err != nil {
-				log.Printf("Could not load sample: %s\n", sampleFilePath)
-				return nil, err
+				log.Fatalf("Could not load sample: %s\n", sampleFilePath)
 			}
 			k.Samples[instrument] = sample
 		}

@@ -69,8 +69,6 @@ func NewMidi(deviceName string) (*Midi, error) {
 
 	portmidi.Initialize()
 
-	log.Println("Midi Device Count>", portmidi.CountDevices())
-
 	var deviceID portmidi.DeviceID
 
 	for i := 0; i < portmidi.CountDevices(); i++ {
@@ -85,7 +83,7 @@ func NewMidi(deviceName string) (*Midi, error) {
 	var streamErr error
 	m.OutputStream, streamErr = portmidi.NewOutputStream(deviceID, 1024, 0)
 	if streamErr != nil {
-		log.Fatal(streamErr)
+		log.Fatalf("Couldn't open Midi Device: '%v'", deviceName)
 	}
 	log.Printf("Stream Opened Device ID:%d > %+v\n", deviceID, portmidi.Info(deviceID))
 
