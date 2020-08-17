@@ -5,7 +5,6 @@ import (
     "os"
     "time"
     "github.com/fjania/fjroland/pkg/sequencer"
-    "github.com/fsnotify/fsnotify"
 	flags "github.com/jessevdk/go-flags"
 )
 
@@ -44,30 +43,6 @@ func main() {
 	for _, e := range opts.SamplePacks{
 		s.ConfigureSamplesOutput(e)
 	}
-
-    watcher, err := fsnotify.NewWatcher()
-    if err != nil {
-        log.Printf("Error starting watcher %s", s.PatternFilePath)
-    }
-    defer watcher.Close()
-
-    go func() {
-        for {
-            select {
-            case event := <-watcher.Events:
-                if event.Op&fsnotify.Write == fsnotify.Write {
-                    s.LoadPattern(s.PatternFilePath)
-                }
-
-            case err := <-watcher.Errors:
-                log.Printf("Error in watching %s: %v", s.PatternFilePath, err)
-            }
-        }
-    }()
-
-    if err := watcher.Add(s.PatternFilePath); err != nil {
-        log.Printf("Error watching %s", s.PatternFilePath)
-    }
 
     for {
         time.Sleep(time.Second * 3)

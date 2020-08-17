@@ -5,6 +5,7 @@ import (
     "log"
     "os"
 	"strings"
+	"github.com/fsnotify/fsnotify"
     p "github.com/fjania/fjroland/pkg/pattern"
     a "github.com/fjania/fjroland/pkg/audio"
     w "github.com/fjania/fjroland/pkg/audio/waveform"
@@ -70,6 +71,8 @@ func (s *Sequencer) LoadPattern(patternFilePath string) error {
     s.Pattern = pattern
     s.Timer.SetStepInterval(s.Pattern.BPM, s.Pattern.DivisionsPerBeat)
 
+	s.WatchPatternFile()
+
     return nil
 }
 
@@ -123,4 +126,29 @@ func (s *Sequencer) AudioDeviceNameList() string{
 		outputs[i] = o.Name()
 	}
 	return strings.Join(outputs, ", ")
+}
+
+func (s *Sequencer) WatchPatternFile() {
+    watcher, err := fsnotify.NewWatcher()
+    if err != nil {
+        log.Printf("Error starting watcher %s", s.PatternFilePath)
+    }
+
+    go func() {
+        for {
+            select {
+            case event := <-watcher.Events:
+                if event.Op&fsnotify.Write == fsnotify.Write {
+                    s.LoadPattern(s.PatternFilePath)
+                }
+
+            case err := <-watcher.Errors:
+                log.Printf("Error in watching %s: %v", s.PatternFilePath, err)
+            }
+        }
+    }()
+
+    if err := watcher.Add(s.PatternFilePath); err != nil {
+        log.Printf("Error watching %s", s.PatternFilePath)
+    }
 }
