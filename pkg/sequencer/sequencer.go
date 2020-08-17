@@ -85,7 +85,8 @@ func (s *Sequencer) LoadPattern(patternFilePath string) error {
 	if err != nil {
 		// Note - We don't fatal here in case the sqeucer is running
 		// and we want to let the user try to load a new patter again.
-		log.Printf("Failed to load pattern file: '%s'", patternFilePath)
+		log.Printf("Failed to parse pattern file: '%s'", patternFilePath)
+		log.Printf("Error: %s", err)
 		return err
 	}
 

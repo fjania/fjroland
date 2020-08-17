@@ -157,3 +157,18 @@ func TestParsePattern(t *testing.T) {
 	)
 
 }
+
+func TestParseInvalidPattern(t *testing.T) {
+	var p = []byte(`
+    {"title": "Turn Down for What",
+    "bpm": 100,
+    "tracks": [
+        "Snare:   |--------|--------|--------|",
+        "Bass:    |----|----|----|----|----|----|"
+    ]}`)
+
+	_, err := ParsePattern(p)
+	if err == nil {
+		t.Errorf("ParsePattern did not fail on non-uniform tracks.")
+	}
+}

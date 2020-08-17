@@ -3,7 +3,6 @@ package pattern
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"strings"
 )
 
@@ -84,14 +83,12 @@ func ParsePattern(patternJson []byte) (*Pattern, error) {
 	var p Pattern
 	err := json.Unmarshal(patternJson, &p)
 	if err != nil {
-		log.Fatal("Error parsing JSON file. ", err)
 		return nil, err
 	}
 
-	// Todo - fail on patterns with no tracks
 	if len(p.Tracks) == 0 {
 		return nil, fmt.Errorf(
-			"Malformed track entry. There must be at least one track in the file.",
+			"Malformed pattern. There must be at least one track in the file.",
 		)
 	}
 
@@ -99,6 +96,15 @@ func ParsePattern(patternJson []byte) (*Pattern, error) {
 	p.Beats = p.Tracks[0].Beats
 	p.Divisions = p.Tracks[0].Divisions
 	p.DivisionsPerBeat = p.Tracks[0].DivisionsPerBeat
+
+	// Validate that all tracks are the same form
+	for _, t := range p.Tracks {
+		if t.Beats != p.Beats || t.Divisions != p.Divisions || t.DivisionsPerBeat != p.DivisionsPerBeat {
+			return nil, fmt.Errorf(
+				"Malformed pattern. All tracks must have the same number of beats and divisions.",
+			)
+		}
+	}
 
 	return &p, nil
 }
