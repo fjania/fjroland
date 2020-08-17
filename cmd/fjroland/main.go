@@ -40,6 +40,6 @@ func main() {
 	}
 
 	for {
-		time.Sleep(time.Second * 3)
+		time.Sleep(time.Second)
 	}
 }
