@@ -2,9 +2,9 @@ package sequencer
 
 import (
     "fmt"
+    "strings"
     tm "github.com/buger/goterm"
     p "github.com/fjania/fjroland/pkg/pattern"
-    "strings"
 )
 
 func RenderTimeline(track p.Track, pulse int, available bool) string {
@@ -63,6 +63,13 @@ func RenderPattern(s *Sequencer, pulse int) {
         }
         tm.Println(trackLabel, RenderTimeline(t, pulse, isAvailable))
     }
+
+    tm.Println()
+	if len(s.AudioOutputs) < 1 {
+		tm.Println(tm.Color(tm.Bold("(No audio outputs specified.)"), tm.RED))
+	} else {
+		tm.Println(tm.Bold("Playing on:"), s.AudioDeviceNameList())
+	}
 
     tm.Flush()
 }

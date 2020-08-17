@@ -4,6 +4,7 @@ import (
     "io/ioutil"
     "log"
     "os"
+	"strings"
     p "github.com/fjania/fjroland/pkg/pattern"
     a "github.com/fjania/fjroland/pkg/audio"
     w "github.com/fjania/fjroland/pkg/audio/waveform"
@@ -114,4 +115,12 @@ func (s *Sequencer) IsInstrumentAvailable(i string) bool{
     }
 
     return false
+}
+
+func (s *Sequencer) AudioDeviceNameList() string{
+	var outputs = make([]string, len(s.AudioOutputs))
+	for i, o := range s.AudioOutputs {
+		outputs[i] = o.Name()
+	}
+	return strings.Join(outputs, ", ")
 }
