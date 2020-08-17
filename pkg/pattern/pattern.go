@@ -1,57 +1,57 @@
 package pattern
 
 import (
-    "encoding/json"
-    "fmt"
-    "log"
-    "strings"
+	"encoding/json"
+	"fmt"
+	"log"
+	"strings"
 )
 
 type Pattern struct {
-    Title   string
-    BPM    int
-    Tracks []Track
-    Beats            int
-    Divisions        int
-    DivisionsPerBeat int
+	Title            string
+	BPM              int
+	Tracks           []Track
+	Beats            int
+	Divisions        int
+	DivisionsPerBeat int
 }
 
 type Track struct {
-    Instrument       string
-    Steps            []int
-    Beats            int
-    Divisions        int
-    DivisionsPerBeat int
+	Instrument       string
+	Steps            []int
+	Beats            int
+	Divisions        int
+	DivisionsPerBeat int
 }
 
 const (
-    SILENT = 0
-    SILENTMARKER = "-"
+	SILENT       = 0
+	SILENTMARKER = "-"
 
-    GHOST  = 1
-    GHOSTMARKER  = "o"
+	GHOST       = 1
+	GHOSTMARKER = "o"
 
-    STRIKE = 2
-    STRIKEMARKER = "X"
+	STRIKE       = 2
+	STRIKEMARKER = "X"
 
-    ACCENT = 3
-    ACCENTMARKER = ">"
+	ACCENT       = 3
+	ACCENTMARKER = ">"
 
-    BEATMARKER = "|"
+	BEATMARKER = "|"
 )
 
 var IndicatorsAsLevels = map[string]int{
-    SILENTMARKER: SILENT,
-    GHOSTMARKER: GHOST,
-    STRIKEMARKER: STRIKE,
-    ACCENTMARKER: ACCENT,
+	SILENTMARKER: SILENT,
+	GHOSTMARKER:  GHOST,
+	STRIKEMARKER: STRIKE,
+	ACCENTMARKER: ACCENT,
 }
 
 var LevelsAsIndicators = map[int]string{
-    SILENT: SILENTMARKER,
-    GHOST:  GHOSTMARKER,
-    STRIKE: STRIKEMARKER,
-    ACCENT: ACCENTMARKER,
+	SILENT: SILENTMARKER,
+	GHOST:  GHOSTMARKER,
+	STRIKE: STRIKEMARKER,
+	ACCENT: ACCENTMARKER,
 }
 
 /*
@@ -69,38 +69,38 @@ var LevelsAsIndicators = map[int]string{
 *  a custom format, and json is portable. I'm also trying
 *  to keep the format human readable, so one can modify the
 *  pattern in a simple text editor.
-*/
+ */
 
 func (t *Track) UnmarshalJSON(b []byte) error {
-    var s string
-    if err := json.Unmarshal(b, &s); err != nil {
-        return err
-    }
-    err := t.ParseTrack(s)
-    return err
+	var s string
+	if err := json.Unmarshal(b, &s); err != nil {
+		return err
+	}
+	err := t.ParseTrack(s)
+	return err
 }
 
 func ParsePattern(patternJson []byte) (*Pattern, error) {
-    var p Pattern
-    err := json.Unmarshal(patternJson, &p)
-    if err != nil {
-        log.Fatal("Error parsing JSON file. ", err)
-        return nil, err
-    }
+	var p Pattern
+	err := json.Unmarshal(patternJson, &p)
+	if err != nil {
+		log.Fatal("Error parsing JSON file. ", err)
+		return nil, err
+	}
 
-    // Todo - fail on patterns with no tracks
-    if len(p.Tracks) == 0 {
-        return nil, fmt.Errorf(
-            "Malformed track entry. There must be at least one track in the file.",
-        )
-    }
+	// Todo - fail on patterns with no tracks
+	if len(p.Tracks) == 0 {
+		return nil, fmt.Errorf(
+			"Malformed track entry. There must be at least one track in the file.",
+		)
+	}
 
-    // Copy up all the uniform track parameters for easy access later.
-    p.Beats = p.Tracks[0].Beats
-    p.Divisions = p.Tracks[0].Divisions
-    p.DivisionsPerBeat = p.Tracks[0].DivisionsPerBeat
+	// Copy up all the uniform track parameters for easy access later.
+	p.Beats = p.Tracks[0].Beats
+	p.Divisions = p.Tracks[0].Divisions
+	p.DivisionsPerBeat = p.Tracks[0].DivisionsPerBeat
 
-    return &p, nil
+	return &p, nil
 }
 
 /*
@@ -115,93 +115,92 @@ func ParsePattern(patternJson []byte) (*Pattern, error) {
  */
 func (track *Track) ParseTrack(trackAsString string) error {
 
-    parts := strings.Split(trackAsString, ":")
+	parts := strings.Split(trackAsString, ":")
 
-    // If we separated on colon and there are more than two parts, there's
-    // a problem.
-    if len(parts) != 2 {
-        return fmt.Errorf(
-            "Malformed track entry. Instrument and track parts could not be identified: %q",
-            trackAsString,
-        )
-    }
+	// If we separated on colon and there are more than two parts, there's
+	// a problem.
+	if len(parts) != 2 {
+		return fmt.Errorf(
+			"Malformed track entry. Instrument and track parts could not be identified: %q",
+			trackAsString,
+		)
+	}
 
-    instrument := strings.TrimSpace(parts[0])
-    trackSpec := strings.Trim(parts[1], " ")
+	instrument := strings.TrimSpace(parts[0])
+	trackSpec := strings.Trim(parts[1], " ")
 
-    // The track layout must start and end with a | character
-    start := string(trackSpec[0])
-    end := string(trackSpec[len(trackSpec)-1])
-    if start != BEATMARKER && end != BEATMARKER {
-        return fmt.Errorf(
-            "Malformed track entry. No leading/trailing '%s' characters: %q",
-            BEATMARKER,
-            trackAsString,
-        )
-    }
+	// The track layout must start and end with a | character
+	start := string(trackSpec[0])
+	end := string(trackSpec[len(trackSpec)-1])
+	if start != BEATMARKER && end != BEATMARKER {
+		return fmt.Errorf(
+			"Malformed track entry. No leading/trailing '%s' characters: %q",
+			BEATMARKER,
+			trackAsString,
+		)
+	}
 
-    divisions := 0
-    divisionsPerBeat := 0
-    divisionsInThisBeat := 0
-    beats := 0
+	divisions := 0
+	divisionsPerBeat := 0
+	divisionsInThisBeat := 0
+	beats := 0
 
-    for _, e := range trackSpec {
-        char := string(e)
-        if char == BEATMARKER {
-            // If we reading this first beat, we'll be defining the beats per
-            // division we expect from now on.
-            if beats == 1 {
-                divisionsPerBeat = divisionsInThisBeat
+	for _, e := range trackSpec {
+		char := string(e)
+		if char == BEATMARKER {
+			// If we reading this first beat, we'll be defining the beats per
+			// division we expect from now on.
+			if beats == 1 {
+				divisionsPerBeat = divisionsInThisBeat
 
-                // if it's not the first beat, we need to check that we're always
-                // using that number of divisions
-            } else {
-                if divisionsInThisBeat != divisionsPerBeat {
-                    return fmt.Errorf(
-                        "Malformed track entry. Non-uniform beat divisions: %q",
-                        trackAsString,
-                    )
-                }
-            }
+				// if it's not the first beat, we need to check that we're always
+				// using that number of divisions
+			} else {
+				if divisionsInThisBeat != divisionsPerBeat {
+					return fmt.Errorf(
+						"Malformed track entry. Non-uniform beat divisions: %q",
+						trackAsString,
+					)
+				}
+			}
 
-            divisionsInThisBeat = 0
-            beats++
+			divisionsInThisBeat = 0
+			beats++
 
-        } else {
-            divisions++
-            divisionsInThisBeat++
+		} else {
+			divisions++
+			divisionsInThisBeat++
 
-            if char != SILENTMARKER && IndicatorsAsLevels[char] == 0 {
-                return fmt.Errorf(
-                    "Malformed track entry. Invalid indicator %s: %s",
-                    char,
-                    trackAsString,
-                )
-            }
-        }
-    }
+			if char != SILENTMARKER && IndicatorsAsLevels[char] == 0 {
+				return fmt.Errorf(
+					"Malformed track entry. Invalid indicator %s: %s",
+					char,
+					trackAsString,
+				)
+			}
+		}
+	}
 
-    // Remove the extra beat we counted
-    beats--
+	// Remove the extra beat we counted
+	beats--
 
-    // Now that we knoe the input is valid, we make another pass to capture the
-    // data we'll need. Build the array for steps, reset the divisions count and
-    // start capturing
-    steps := make([]int, divisions)
-    division := 0
-    for _, e := range trackSpec {
-        char := string(e)
-        if char != BEATMARKER {
-            steps[division] = IndicatorsAsLevels[char]
-            division++
-        }
-    }
+	// Now that we knoe the input is valid, we make another pass to capture the
+	// data we'll need. Build the array for steps, reset the divisions count and
+	// start capturing
+	steps := make([]int, divisions)
+	division := 0
+	for _, e := range trackSpec {
+		char := string(e)
+		if char != BEATMARKER {
+			steps[division] = IndicatorsAsLevels[char]
+			division++
+		}
+	}
 
-
-    track.Instrument = instrument
-    track.Steps = steps
-    track.Beats = beats
-    track.Divisions = divisions
-    track.DivisionsPerBeat = divisionsPerBeat
-    return nil
+	track.Instrument = instrument
+	track.Steps = steps
+	track.Beats = beats
+	track.Divisions = divisions
+	track.DivisionsPerBeat = divisionsPerBeat
+	return nil
 }
