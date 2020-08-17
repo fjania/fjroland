@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/fjania/fjroland/pkg/sequencer"
 	flags "github.com/jessevdk/go-flags"
 	"log"
@@ -14,13 +15,13 @@ func main() {
 			PatternFile string `required:"1"`
 		} `positional-args:"yes" required:"yes"`
 		MidiDevices []string `short:"m" long:"midi" description:"A midi device name to output to"`
-		SamplePacks []string `short:"s" long:"samples" description:"A directory of samples to use for waveform playback"`
+		SamplePacks []string `short:"s" long:"samples" description:"A directory of samples to use for waveform playback" default:"assets/samplepacks/acoustic"`
 	}
 
 	parser := flags.NewParser(&opts, flags.Default)
 	_, err := parser.Parse()
 	if err != nil {
-		parser.WriteHelp(os.Stderr)
+		fmt.Println("Try the -h flag for help with this command")
 		os.Exit(1)
 	}
 
