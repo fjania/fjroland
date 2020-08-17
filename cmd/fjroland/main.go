@@ -18,20 +18,14 @@ func main() {
 	}
 
 	parser := flags.NewParser(&opts, flags.Default)
-	args, err := parser.Parse()
+	_, err := parser.Parse()
 	if err != nil {
 		parser.WriteHelp(os.Stderr)
 		os.Exit(1)
 	}
 
-	log.Printf("Pattern> %v", opts.Positional.PatternFile)
-	log.Printf("Devices> %v", opts.MidiDevices)
-	log.Printf("Samples> %v", opts.SamplePacks)
-	log.Printf("Args> %v", args)
-
-    s := sequencer.NewSequencer()
-	serr := s.LoadPattern(opts.Positional.PatternFile)
-    if serr != nil {
+    s, err := sequencer.NewSequencer(opts.Positional.PatternFile)
+    if err != nil {
         log.Fatalf("Could not load pattern file: '%s'", opts.Positional.PatternFile)
     }
     s.Start()

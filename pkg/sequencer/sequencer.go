@@ -19,12 +19,18 @@ type Sequencer struct {
     PatternFilePath string
 }
 
-func NewSequencer() (*Sequencer) {
+func NewSequencer(patternFilePath string) (*Sequencer, error) {
     s := &Sequencer{
         Timer:   NewTimer(),
+		PatternFilePath: patternFilePath,
     }
 
-    return s
+	err := s.LoadPattern(s.PatternFilePath)
+	if err != nil {
+		return nil, err
+	}
+
+    return s, nil
 }
 
 func (s *Sequencer) ConfigureSamplesOutput(samplePackPath string) error {
@@ -52,7 +58,6 @@ func (s *Sequencer) ConfigureMidiOutput(deviceName string) error {
 }
 
 func (s *Sequencer) LoadPattern(patternFilePath string) error {
-    s.PatternFilePath = patternFilePath
 
     jsonFile, err := os.Open(patternFilePath)
     if err != nil {
