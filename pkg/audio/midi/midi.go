@@ -83,7 +83,8 @@ func NewMidi(deviceName string) (*Midi, error) {
 	var streamErr error
 	m.OutputStream, streamErr = portmidi.NewOutputStream(deviceID, 1024, 0)
 	if streamErr != nil {
-		log.Fatalf("Couldn't open Midi Device: '%v'", deviceName)
+		log.Printf("Failed to open Midi Device: '%v'", deviceName)
+		return nil, streamErr
 	}
 	log.Printf("Stream Opened Device ID:%d > %+v\n", deviceID, portmidi.Info(deviceID))
 

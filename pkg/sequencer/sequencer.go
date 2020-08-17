@@ -27,6 +27,7 @@ func NewSequencer(patternFilePath string) (*Sequencer, error) {
 
 	err := s.LoadPattern(s.PatternFilePath)
 	if err != nil {
+		log.Fatalf("Failed to load pattern file: '%s'", patternFilePath)
 		return nil, err
 	}
 
@@ -37,8 +38,7 @@ func (s *Sequencer) ConfigureSamplesOutput(samplePackPath string) error {
 
 	o, err := w.NewSamplePack(samplePackPath)
 	if err != nil {
-		log.Fatal(err)
-		return err
+		log.Fatalf("Failed to load sample pack: '%s'", samplePackPath)
 	}
 	s.AudioOutputs = append(s.AudioOutputs, o)
 
@@ -49,8 +49,7 @@ func (s *Sequencer) ConfigureMidiOutput(deviceName string) error {
 
 	o, err := m.NewMidi(deviceName)
 	if err != nil {
-		log.Fatal(err)
-		return err
+		log.Fatalf("Failed to configure midi device: '%s'", deviceName)
 	}
 	s.AudioOutputs = append(s.AudioOutputs, o)
 
@@ -61,19 +60,18 @@ func (s *Sequencer) LoadPattern(patternFilePath string) error {
 
 	jsonFile, err := os.Open(patternFilePath)
 	if err != nil {
-		log.Fatal(err)
-		return err
+		log.Fatalf("Failed to load pattern file: '%s'", patternFilePath)
 	}
 	jsonBlob, _ := ioutil.ReadAll(jsonFile)
 	jsonFile.Close()
 
 	pattern, err := p.ParsePattern(jsonBlob)
 	if err != nil {
-		log.Fatal(err)
-		return err
+		log.Fatalf("Failed to parse pattern file: '%s'", patternFilePath)
 	}
 
 	s.Pattern = pattern
+
 	s.Timer.SetStepInterval(s.Pattern.BPM, s.Pattern.DivisionsPerBeat)
 
 	s.WatchPatternFile()
