@@ -22,6 +22,33 @@ type SamplePack struct {
 	SamplePackPath string
 }
 
+func NewSamplePack(samplePackPath string) (*SamplePack, error) {
+	samplePack, err := LoadSamplePack(samplePackPath)
+	if err != nil {
+		return nil, err
+	}
+
+	err = portaudio.Initialize()
+	if err != nil {
+		return nil, err
+	}
+
+	stream, err := portaudio.OpenDefaultStream(
+		0,
+		2,
+		44100.0,
+		portaudio.FramesPerBufferUnspecified,
+		samplePack.ProcessAudio,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	stream.Start()
+	return samplePack, nil
+}
+
 func LoadSamplePack(samplePackPath string) (*SamplePack, error) {
 	k := &SamplePack{
 		Samples: make(map[string]*Sample),
@@ -106,33 +133,6 @@ func LoadSample(filepath string) (*Sample, error) {
 func (s *Sample) Play(level float32) {
 	s.Volume = level * level
 	s.Playhead = 0
-}
-
-func NewSamplePack(samplePackPath string) (*SamplePack, error) {
-	samplePack, err := LoadSamplePack(samplePackPath)
-	if err != nil {
-		return nil, err
-	}
-
-	err = portaudio.Initialize()
-	if err != nil {
-		return nil, err
-	}
-
-	stream, err := portaudio.OpenDefaultStream(
-		0,
-		2,
-		44100.0,
-		portaudio.FramesPerBufferUnspecified,
-		samplePack.ProcessAudio,
-	)
-
-	if err != nil {
-		return nil, err
-	}
-
-	stream.Start()
-	return samplePack, nil
 }
 
 func (k *SamplePack) ProcessAudio(out []float32) {
