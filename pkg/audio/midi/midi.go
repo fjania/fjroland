@@ -25,21 +25,21 @@ const (
 // There's no reason we couldn't support all of them, but this is a fine
 // place to start for this example.
 var instruments = [15]Instrument{
-	Instrument{"Bass", 35},
-	Instrument{"Cross-stick", 37},
-	Instrument{"Snare", 38},
-	Instrument{"Clap", 39},
-	Instrument{"High Tom", 50},
-	Instrument{"Mid Tom", 48},
-	Instrument{"Low Tom", 41},
-	Instrument{"Closed Hi-Hat", 42},
-	Instrument{"Pedal Hi-Hat", 44},
-	Instrument{"Open Hi-Hat", 46},
-	Instrument{"Crash Cymbal", 49},
-	Instrument{"Ride Cymbal", 51},
-	Instrument{"Ride Bell", 53},
-	Instrument{"Tambourine", 54},
-	Instrument{"Cowbell", 56},
+	Instrument{"bass", 35},
+	Instrument{"cross-stick", 37},
+	Instrument{"snare", 38},
+	Instrument{"clap", 39},
+	Instrument{"high tom", 50},
+	Instrument{"mid tom", 48},
+	Instrument{"low tom", 41},
+	Instrument{"closed hi-hat", 42},
+	Instrument{"pedal hi-hat", 44},
+	Instrument{"open hi-hat", 46},
+	Instrument{"crash cymbal", 49},
+	Instrument{"ride cymbal", 51},
+	Instrument{"ride bell", 53},
+	Instrument{"tambourine", 54},
+	Instrument{"cowbell", 56},
 }
 
 func NewMidi(deviceName string) (*Midi, error) {

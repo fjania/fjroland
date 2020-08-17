@@ -71,7 +71,7 @@ func LoadSamplePack(samplePackPath string) (*SamplePack, error) {
 	for _, f := range files {
 		sampleFilePath := samplePackPath + string(os.PathSeparator) + f.Name()
 		if strings.HasSuffix(f.Name(), ".wav") {
-			instrument := strings.TrimRight(f.Name(), ".wav")
+			instrument := strings.ToLower(strings.TrimRight(f.Name(), ".wav"))
 
 			sample, err := LoadSample(sampleFilePath)
 			if err != nil {

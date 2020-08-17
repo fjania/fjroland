@@ -127,8 +127,8 @@ func (s *Sequencer) playAtPulse(pulse int) {
 		noteLevel := t.Steps[pulse]
 		if noteLevel > 0 {
 			for _, o := range s.AudioOutputs {
-				if o.HasInstrument(t.Instrument) {
-					o.Play(t.Instrument, float32(noteLevel))
+				if o.HasInstrument(strings.ToLower(t.Instrument)) {
+					o.Play(strings.ToLower(t.Instrument), float32(noteLevel))
 				}
 			}
 		}
@@ -137,7 +137,7 @@ func (s *Sequencer) playAtPulse(pulse int) {
 
 func (s *Sequencer) IsInstrumentAvailable(i string) bool {
 	for _, o := range s.AudioOutputs {
-		if o.HasInstrument(i) {
+		if o.HasInstrument(strings.ToLower(i)) {
 			return true
 		}
 	}
