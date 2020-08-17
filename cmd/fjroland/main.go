@@ -1,12 +1,11 @@
 package main
 
 import (
-    //"fmt"
     "log"
     "os"
     "time"
     "github.com/fjania/fjroland/pkg/sequencer"
-    //"github.com/fsnotify/fsnotify"
+    "github.com/fsnotify/fsnotify"
 	flags "github.com/jessevdk/go-flags"
 )
 
@@ -46,7 +45,6 @@ func main() {
 		s.ConfigureSamplesOutput(e)
 	}
 
-	/*
     watcher, err := fsnotify.NewWatcher()
     if err != nil {
         log.Printf("Error starting watcher %s", s.PatternFilePath)
@@ -70,16 +68,8 @@ func main() {
     if err := watcher.Add(s.PatternFilePath); err != nil {
         log.Printf("Error watching %s", s.PatternFilePath)
     }
-	*/
 
     for {
         time.Sleep(time.Second * 3)
     }
 }
-
-/*
-var Usage = func() {
-    fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
-    flag.PrintDefaults()
-}
-*/
