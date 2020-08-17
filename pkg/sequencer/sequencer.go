@@ -27,13 +27,24 @@ func NewSequencer(patternFilePath string) (*Sequencer, error) {
 
 	err := s.LoadPattern(s.PatternFilePath)
 	if err != nil {
-		log.Fatalf("Failed to load pattern file: '%s'", patternFilePath)
-		return nil, err
+		// Bail if we try to create a sequencer but we can't find the pattern
+		// file. If we assume we're only creating a sequencer from the CLI, then
+		// this makes sense. This could changed if we needed to load a sequencer
+		// before we had any content to play on it.
+		log.Fatalf("Error: Can't start up the seqencer without a pattern file.")
 	}
+
+	// Watch for changes to the pattern file. This will let us update the pattern
+	// as the user edits it. (We assume we're not loading new pattern files in this
+	// version of the sequencer, so we don't worry about being able to change the
+	// file we're watching)
+	s.WatchPatternFile()
 
 	return s, nil
 }
 
+// We'll allow multiple sample outputs for no good reason other than
+// maybe people want to experiment with layering different intstruments?
 func (s *Sequencer) ConfigureSamplesOutput(samplePackPath string) error {
 
 	o, err := w.NewSamplePack(samplePackPath)
@@ -45,6 +56,8 @@ func (s *Sequencer) ConfigureSamplesOutput(samplePackPath string) error {
 	return nil
 }
 
+// We'll allow multiple midi outputs for no good reason other than
+// maybe people want to experiment with layering different intstruments?
 func (s *Sequencer) ConfigureMidiOutput(deviceName string) error {
 
 	o, err := m.NewMidi(deviceName)
@@ -60,25 +73,29 @@ func (s *Sequencer) LoadPattern(patternFilePath string) error {
 
 	jsonFile, err := os.Open(patternFilePath)
 	if err != nil {
-		log.Fatalf("Failed to load pattern file: '%s'", patternFilePath)
+		// Note - We don't fatal here in case the sqeucer is running
+		// and we want to let the user try to load a new patter again.
+		log.Printf("Failed to load pattern file: '%s'", patternFilePath)
+		return err
 	}
 	jsonBlob, _ := ioutil.ReadAll(jsonFile)
 	jsonFile.Close()
 
 	pattern, err := p.ParsePattern(jsonBlob)
 	if err != nil {
-		log.Fatalf("Failed to parse pattern file: '%s'", patternFilePath)
+		// Note - We don't fatal here in case the sqeucer is running
+		// and we want to let the user try to load a new patter again.
+		log.Printf("Failed to load pattern file: '%s'", patternFilePath)
+		return err
 	}
 
 	s.Pattern = pattern
-
 	s.Timer.SetStepInterval(s.Pattern.BPM, s.Pattern.DivisionsPerBeat)
-
-	s.WatchPatternFile()
-
 	return nil
 }
 
+// All we really need to do to start is to tell the sequencer to start
+// listening for pusles, and then start the pulses.
 func (s *Sequencer) Start() {
 	go handlePulses(s)
 	go s.Timer.Start()
@@ -102,12 +119,16 @@ func handlePulses(s *Sequencer) {
 	}
 }
 
+// Play a note any time the note's level is > 0, for each audio output
+// as long as that instrument exists in that audio output
 func (s *Sequencer) playAtPulse(pulse int) {
-	for _, o := range s.AudioOutputs {
-		for _, t := range s.Pattern.Tracks {
-			hit := t.Steps[pulse]
-			if hit > 0 && o.HasInstrument(t.Instrument) {
-				o.Play(t.Instrument, float32(hit))
+	for _, t := range s.Pattern.Tracks {
+		noteLevel := t.Steps[pulse]
+		if noteLevel > 0 {
+			for _, o := range s.AudioOutputs {
+				if o.HasInstrument(t.Instrument) {
+					o.Play(t.Instrument, float32(noteLevel))
+				}
 			}
 		}
 	}

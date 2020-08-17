@@ -1,11 +1,11 @@
 package main
 
 import (
-    "log"
-    "os"
-    "time"
-    "github.com/fjania/fjroland/pkg/sequencer"
+	"github.com/fjania/fjroland/pkg/sequencer"
 	flags "github.com/jessevdk/go-flags"
+	"log"
+	"os"
+	"time"
 )
 
 func main() {
@@ -24,21 +24,21 @@ func main() {
 		os.Exit(1)
 	}
 
-    s, err := sequencer.NewSequencer(opts.Positional.PatternFile)
-    if err != nil {
-        log.Fatalf("Could not load pattern file: '%s'", opts.Positional.PatternFile)
-    }
-    s.Start()
+	s, err := sequencer.NewSequencer(opts.Positional.PatternFile)
+	if err != nil {
+		log.Fatalf("Could not load pattern file: '%s'", opts.Positional.PatternFile)
+	}
+	s.Start()
 
-	for _, e := range opts.MidiDevices{
+	for _, e := range opts.MidiDevices {
 		s.ConfigureMidiOutput(e)
 	}
 
-	for _, e := range opts.SamplePacks{
+	for _, e := range opts.SamplePacks {
 		s.ConfigureSamplesOutput(e)
 	}
 
-    for {
-        time.Sleep(time.Second * 3)
-    }
+	for {
+		time.Sleep(time.Second * 3)
+	}
 }
