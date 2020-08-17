@@ -27,12 +27,9 @@ func (t *Timer) SetStepInterval(tempo int, divisionsPerBeat int) {
 
 func (t *Timer) Start() {
 	for {
-		select {
-		default:
-			interval := t.NanosecondsPerPulse()
-			time.Sleep(interval)
-			t.Pulses <- 1
-		}
+		interval := t.NanosecondsPerPulse()
+		time.Sleep(interval)
+		t.Pulses <- 1
 	}
 }
 

@@ -113,7 +113,7 @@ Finally, here is the pattern for the intro to _"Turn Down for What"_ by DJ Snake
 ```
 
 ## Sample Packs
-Sample packs are just directories of properly nameed wav files. This is the listing of the `assets/samples/acoustic` directory:
+Sample packs are just directories of properly named wav files. This is the listing of the `assets/samples/acoustic` directory:
 
 ```
 assets/samplepacks/acoustic/

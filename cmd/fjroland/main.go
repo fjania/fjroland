@@ -29,7 +29,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Could not load pattern file: '%s'", opts.Positional.PatternFile)
 	}
-	s.Start()
 
 	for _, e := range opts.MidiDevices {
 		s.ConfigureMidiOutput(e)
@@ -38,6 +37,8 @@ func main() {
 	for _, e := range opts.SamplePacks {
 		s.ConfigureSamplesOutput(e)
 	}
+
+	s.Start()
 
 	for {
 		time.Sleep(time.Second)

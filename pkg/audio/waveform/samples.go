@@ -93,6 +93,7 @@ func LoadSamplePack(samplePackPath string) (*SamplePack, error) {
 func LoadSample(filepath string) (*Sample, error) {
 	var info sndfile.Info
 	soundFile, err := sndfile.Open(filepath, sndfile.Read, &info)
+	defer soundFile.Close()
 
 	s := &Sample{
 		Buffer:   make([]float32, info.Samplerate*info.Channels),
@@ -113,8 +114,6 @@ func LoadSample(filepath string) (*Sample, error) {
 	}
 
 	s.Playhead = len(s.Buffer)
-
-	defer soundFile.Close()
 
 	return s, nil
 }
