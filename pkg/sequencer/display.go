@@ -30,7 +30,7 @@ func RenderTimeline(track p.Track, pulse int, available bool) string {
     }
     sb.WriteString(p.BEATMARKER)
     if !available {
-        sb.WriteString(tm.Color(" // not available", tm.YELLOW))
+        sb.WriteString(tm.Color(" // not available on any output", tm.YELLOW))
     }
 
     return sb.String()
@@ -54,8 +54,7 @@ func RenderPattern(s *Sequencer, pulse int) {
     labelFormatter := fmt.Sprintf("%%-%ds", maxLabel+2)
 
     for _, t := range pattern.Tracks {
-        availableInstruments := s.Output.ListInstruments()
-        isAvailable := availableInstruments[t.Instrument]
+        isAvailable := s.IsInstrumentAvailable(t.Instrument)
         trackLabel := fmt.Sprintf(labelFormatter, t.Instrument)
         if !isAvailable {
             trackLabel = tm.Color(trackLabel, tm.YELLOW)

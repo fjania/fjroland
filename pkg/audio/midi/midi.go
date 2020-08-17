@@ -12,6 +12,7 @@ type Instrument struct {
 }
 
 type Midi struct {
+    DeviceName string
     Instruments map[string]bool
     MidiNotes map[string]int
     OutputStream *portmidi.Stream
@@ -35,6 +36,10 @@ var instruments = [15]Instrument{
     Instrument{"Cowbell", 56},
 }
 
+// AudioOutput Interface Methods
+func (m *Midi) Name() string{
+    return m.DeviceName
+}
 func (m *Midi) Play(instrument string, level float32) {
     // input levels are 1, 2, 3 well map them linearly
     // as 40, 80 12
@@ -50,8 +55,9 @@ func (m *Midi) HasInstrument(instrument string) bool {
     return m.Instruments[instrument]
 }
 
-func NewMidi() (*Midi, error){
+func NewMidi(deviceName string) (*Midi, error){
     m := &Midi{
+		DeviceName: deviceName,
         Instruments: make(map[string]bool),
         MidiNotes: make(map[string]int),
     }
@@ -59,25 +65,29 @@ func NewMidi() (*Midi, error){
     for _, ins := range instruments {
         m.Instruments[ins.name] = true
         m.MidiNotes[ins.name] = ins.MidiNote
-
     }
 
     portmidi.Initialize()
 
     log.Println("Midi Device Count>", portmidi.CountDevices())
-    log.Printf("Default Device Info> %+v\n", portmidi.Info(portmidi.DefaultOutputDeviceID()))
-    log.Println("Default Input Device>", portmidi.DefaultInputDeviceID())
-    log.Println("Default Output Device>", portmidi.DefaultOutputDeviceID())
+
+	var deviceID portmidi.DeviceID
+
+	for i := 0; i< portmidi.CountDevices(); i++{
+		info := portmidi.Info(portmidi.DeviceID(i))
+		if info.IsOutputAvailable && info.Name == deviceName {
+			deviceID = portmidi.DeviceID(i)
+			info := portmidi.Info(portmidi.DeviceID(i))
+			log.Printf("Device ID:%d Info> %+v\n", deviceID, info)
+		}
+	}
 
     var streamErr error
-    m.OutputStream, streamErr = portmidi.NewOutputStream(
-        portmidi.DefaultOutputDeviceID(), 1024, 0,
-    )
+    m.OutputStream, streamErr = portmidi.NewOutputStream(deviceID, 1024, 0)
     if streamErr != nil {
         log.Fatal(streamErr)
     }
-
-    log.Printf("Default Device Info> %+v\n", portmidi.Info(portmidi.DefaultOutputDeviceID()))
+	log.Printf("Stream Opened Device ID:%d > %+v\n", deviceID, portmidi.Info(deviceID))
 
     return m, nil
 }

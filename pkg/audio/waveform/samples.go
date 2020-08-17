@@ -19,6 +19,7 @@ type Sample struct {
 type SamplePack struct {
     Samples map[string]*Sample
     Instruments map[string]bool
+    SamplePackPath string
 }
 
 func LoadSamplePack(samplePackPath string) (*SamplePack, error) {
@@ -52,10 +53,16 @@ func LoadSamplePack(samplePackPath string) (*SamplePack, error) {
     }
     k.Instruments = instruments
 
+    k.SamplePackPath = samplePackPath
+
     return k, nil
 }
 
 // Implement the audio Output interface
+func (k *SamplePack) Name() string {
+    return k.SamplePackPath
+}
+
 func (k *SamplePack) Play(instrument string, level float32) {
     k.Samples[instrument].Play(level);
 }

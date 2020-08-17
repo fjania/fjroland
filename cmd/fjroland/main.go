@@ -1,52 +1,52 @@
 package main
 
 import (
-    "flag"
-    "fmt"
+    //"fmt"
     "log"
     "os"
     "time"
     "github.com/fjania/fjroland/pkg/sequencer"
-    "github.com/fsnotify/fsnotify"
+    //"github.com/fsnotify/fsnotify"
+	flags "github.com/jessevdk/go-flags"
 )
 
 func main() {
-    var output string
-    var samplePack string
+	var opts struct {
+		Positional struct {
+			PatternFile string `required:"1"`
+		} `positional-args:"yes" required:"yes"`
+		MidiDevices []string `short:"m" long:"midi" description:"A midi device name to output to"`
+		SamplePacks []string `short:"s" long:"samples" description:"A directory of samples to use for waveform playback"`
+	}
 
+	parser := flags.NewParser(&opts, flags.Default)
+	args, err := parser.Parse()
+	if err != nil {
+		parser.WriteHelp(os.Stderr)
+		os.Exit(1)
+	}
 
-    flag.StringVar(
-        &output,
-        "output",
-        "samples",
-        "--output=samples | midi",
-    )
+	log.Printf("Pattern> %v", opts.Positional.PatternFile)
+	log.Printf("Devices> %v", opts.MidiDevices)
+	log.Printf("Samples> %v", opts.SamplePacks)
+	log.Printf("Args> %v", args)
 
-    flag.StringVar(
-        &samplePack,
-        "samplepack",
-        "assets/samplepacks/acoustic",
-        "--samplepack=path-to-sample-pack",
-    )
-
-    flag.Parse()
-
-
-    if len(flag.Args()) < 1{
-        Usage()
-        os.Exit(1)
+    s := sequencer.NewSequencer()
+	serr := s.LoadPattern(opts.Positional.PatternFile)
+    if serr != nil {
+        log.Fatalf("Could not load pattern file: '%s'", opts.Positional.PatternFile)
     }
-
-    patternFile := flag.Args()[0]
-
-    s, _ := sequencer.NewSequencer(patternFile, output, samplePack)
     s.Start()
 
-    if output != "samples" &&  output != "midi" {
-        Usage()
-        os.Exit(1)
-    }
+	for _, e := range opts.MidiDevices{
+		s.ConfigureMidiOutput(e)
+	}
 
+	for _, e := range opts.SamplePacks{
+		s.ConfigureSamplesOutput(e)
+	}
+
+	/*
     watcher, err := fsnotify.NewWatcher()
     if err != nil {
         log.Printf("Error starting watcher %s", s.PatternFilePath)
@@ -70,13 +70,16 @@ func main() {
     if err := watcher.Add(s.PatternFilePath); err != nil {
         log.Printf("Error watching %s", s.PatternFilePath)
     }
+	*/
 
     for {
         time.Sleep(time.Second * 3)
     }
 }
 
+/*
 var Usage = func() {
     fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
     flag.PrintDefaults()
 }
+*/

@@ -10,42 +10,48 @@ import (
     m "github.com/fjania/fjroland/pkg/audio/midi"
 )
 
-// c := time.Tick(time.Minute/time.Duration(divisionsPerMinute))
 type Sequencer struct {
     Timer   *Timer
     Pattern *p.Pattern
-    Output   a.Output
+    AudioOutputs   []a.AudioOutput
     PatternFilePath string
 }
 
-func NewSequencer(patternFilePath, output, samplePackPath string) (*Sequencer, error) {
+func NewSequencer() (*Sequencer) {
     s := &Sequencer{
         Timer:   NewTimer(),
     }
 
-    s.PatternFilePath = patternFilePath
-    s.LoadPattern(patternFilePath)
+    return s
+}
 
-    if output == "samples" {
-        o, err := w.NewSamplePack(samplePackPath)
-        if err != nil {
-            log.Fatal(err)
-            return nil, err
-        }
-        s.Output = o
-    } else if output == "midi" {
-        o, err := m.NewMidi()
-        if err != nil {
-            log.Fatal(err)
-            return nil, err
-        }
-        s.Output = o
+func (s *Sequencer) ConfigureSamplesOutput(samplePackPath string) error {
+
+    o, err := w.NewSamplePack(samplePackPath)
+    if err != nil {
+        log.Fatal(err)
+        return err
     }
+    s.AudioOutputs = append(s.AudioOutputs, o)
 
-    return s, nil
+    return nil
+}
+
+func (s *Sequencer) ConfigureMidiOutput(deviceName string) error {
+
+    o, err := m.NewMidi(deviceName)
+    if err != nil {
+        log.Fatal(err)
+        return err
+    }
+    s.AudioOutputs = append(s.AudioOutputs, o)
+
+    return nil
 }
 
 func (s *Sequencer) LoadPattern(patternFilePath string) error {
+    s.PatternFilePath = patternFilePath
+
     jsonFile, err := os.Open(patternFilePath)
     if err != nil {
         log.Fatal(err)
@@ -67,24 +73,45 @@ func (s *Sequencer) LoadPattern(patternFilePath string) error {
 }
 
 func (s *Sequencer) Start() {
-    go func() {
-        pulseCount := 0
+    go handlePulses(s)
+    go s.Timer.Start()
+}
 
-        for {
-            select {
-            case <-s.Timer.Pulses:
-                pulse := pulseCount % s.Pattern.Divisions
-                RenderPattern(s, pulse)
-                pulseCount++
-                for _, t := range s.Pattern.Tracks {
-                    hit := t.Steps[pulse]
-                    if hit > 0  && s.Output.HasInstrument(t.Instrument){
-                        s.Output.Play(t.Instrument, float32(hit))
-                    }
-                }
+func handlePulses(s *Sequencer) {
+    pulseCount := 0
+
+    for {
+        select {
+        case <-s.Timer.Pulses:
+            if pulseCount >= s.Pattern.Divisions{
+                pulseCount = 0
+            }
+
+            RenderPattern(s, pulseCount)
+            s.playAtPulse(pulseCount)
+
+            pulseCount++
+        }
+    }
+}
+
+func (s *Sequencer) playAtPulse(pulse int) {
+    for _, o := range s.AudioOutputs {
+        for _, t := range s.Pattern.Tracks {
+            hit := t.Steps[pulse]
+            if hit > 0  && o.HasInstrument(t.Instrument){
+                o.Play(t.Instrument, float32(hit))
             }
         }
-    }()
+    }
+}
 
-    go s.Timer.Start()
+func (s *Sequencer) IsInstrumentAvailable(i string) bool{
+    for _, o := range s.AudioOutputs {
+        if o.HasInstrument(i) {
+            return true
+        }
+    }
+
+    return false
 }
