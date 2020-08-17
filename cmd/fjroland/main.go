@@ -15,7 +15,7 @@ func main() {
 			PatternFile string `required:"1"`
 		} `positional-args:"yes" required:"yes"`
 		MidiDevices []string `short:"m" long:"midi" description:"A midi device name to output to"`
-		SamplePacks []string `short:"s" long:"samples" description:"A directory of samples to use for waveform playback" default:"assets/samplepacks/acoustic"`
+		SamplePacks []string `short:"s" long:"samples" description:"A directory of samples to use for waveform playback"`
 	}
 
 	parser := flags.NewParser(&opts, flags.Default)
